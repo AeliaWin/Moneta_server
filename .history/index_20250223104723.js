@@ -1,15 +1,16 @@
 // require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const expenseRoute = require("./routes/expense");
+const notificationRoutes = require("./routes/notificaitonRoutes");
 
 const app = express();
+
+// Middleware
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
 
 // Routes
-app.use("/api/expenses", expenseRoute);
+app.use("/api", notificationRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

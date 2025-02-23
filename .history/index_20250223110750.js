@@ -9,7 +9,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use("/api/expenses", expenseRoute);
+app.use("/api/expenses", notificationRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
