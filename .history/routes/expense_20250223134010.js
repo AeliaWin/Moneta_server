@@ -4,7 +4,7 @@ const { admin, db } = require("../config/firebaseConfig");
 const router = express.Router();
 
 // Function to save notification history
-export const saveNotificationHistory = async (userId, title, body) => {
+const saveNotificationHistory = async (userId, title, body) => {
   try {
     // 1️⃣ Create a new document in the notification history collection
     const notificationRef = db.collection("notifications").doc();
