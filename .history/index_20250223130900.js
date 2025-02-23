@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 // Routes
 app.use("/api/expenses", expenseRoute);
-app.use("/api", reminderRoute);
+app.use("/api", require( reminderRoute));
 
 // Start Server
 const PORT = process.env.PORT || 5000;
