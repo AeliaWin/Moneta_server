@@ -1,7 +1,7 @@
 const express = require("express");
 const cron = require("node-cron");
 const { admin, db } = require("../config/firebaseConfig");
-const saveNotificationHistory = require("./expense");
+const {saveNotificationHistory:saveNotificationHistory} = require("./expense");
 
 const router = express.Router();
 

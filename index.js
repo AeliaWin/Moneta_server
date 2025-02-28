@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const expenseRoute = require("./routes/expense");
+const  {router: expenseRouter} = require("./routes/expense");
 const reminderRoute = require("./routes/reminder");
 
 const app = express();
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use("/api/expenses", expenseRoute);
+app.use("/api/expenses", expenseRouter);
 app.use("/api", reminderRoute);
 
 // Start Server

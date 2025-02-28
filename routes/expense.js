@@ -4,7 +4,7 @@ const { admin, db } = require("../config/firebaseConfig");
 const router = express.Router();
 
 // Function to save notification history
-export const saveNotificationHistory = async (userId, title, body) => {
+const saveNotificationHistory = async (userId, title, body) => {
   try {
     // 1️⃣ Create a new document in the notification history collection
     const notificationRef = db.collection("notifications").doc();
@@ -56,19 +56,29 @@ const sendNotification = async (userId, title, body) => {
 
 // Route to add an expense & update budget dynamically
 router.post("/add-expense", async (req, res) => {
-  const { userId, description, amount, category, date, month, year } = req.body;
+  const { userId, description, amount, category, date } = req.body;
 
-  if (!userId || !description || !amount || !category || !date || !month || !year) {
+  if (!userId || !description || !amount || !category || !date) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
+    // Extract month and year from the date
+    const expenseDate = new Date(date);
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const monthIndex = expenseDate.getMonth(); // Get month index (0-11)
+    const monthName = monthNames[monthIndex]; // Get month name
+    const year = expenseDate.getFullYear();
+    
     // 1️⃣ Find the budget inside `users/{userId}/budgets`
     const budgetRef = db
       .collection("users")
       .doc(userId)
       .collection("budgets")
-      .where("month", "==", month)
+      .where("month", "==", monthName)
       .where("year", "==", year);
 
     const budgetSnap = await budgetRef.get();
@@ -84,14 +94,18 @@ router.post("/add-expense", async (req, res) => {
 
     // 2️⃣ Add the expense under `users/{userId}/expenses`
     const expenseData = {
-      userId,
       description,
       amount,
       category,
       date: new Date(date),
+      timestamp: new Date().toISOString(),
     };
 
     const expenseRef = await db.collection("users").doc(userId).collection("expenses").add(expenseData);
+
+    // Add the document ID as the 'id' field in the expense data
+    const expenseId = expenseRef.id;
+    await expenseRef.update({ id: expenseId });
 
     // 3️⃣ Dynamically update the budget's used amount
     const newUsedAmount = used + amount;
@@ -100,7 +114,7 @@ router.post("/add-expense", async (req, res) => {
     // 4️⃣ Compare `used` and `total`, send notification if exceeded
     if (newUsedAmount > total) {
       const title = "⚠️ Budget Exceeded!";
-      const body = `You've spent ${newUsedAmount} out of ${total} for ${month} ${year}. Consider reducing expenses.`;
+      const body = `You've spent ${newUsedAmount} out of ${total} for ${monthName} ${year}. Consider reducing expenses.`;
       await sendNotification(userId, title, body);
     }
 
@@ -111,4 +125,5 @@ router.post("/add-expense", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = { router, saveNotificationHistory };
+
