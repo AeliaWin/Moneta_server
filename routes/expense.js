@@ -94,6 +94,7 @@ router.post("/add-expense", async (req, res) => {
 
     // 2️⃣ Add the expense under `users/{userId}/expenses`
     const expenseData = {
+      userId,
       description,
       amount,
       category,
